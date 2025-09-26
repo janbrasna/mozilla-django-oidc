@@ -5,11 +5,11 @@ mozilla-django-oidc
 .. image:: https://badge.fury.io/py/mozilla-django-oidc.svg
    :target: https://badge.fury.io/py/mozilla-django-oidc
 
-.. image:: https://codecov.io/gh/mozilla/mozilla-django-oidc/branch/main/graph/badge.svg
+.. image:: https://codecov.io/gh/mozilla/mozilla-django-oidc/graph/badge.svg
    :target: https://codecov.io/gh/mozilla/mozilla-django-oidc
 
-.. image:: https://circleci.com/gh/mozilla/mozilla-django-oidc/tree/main.svg?style=svg
-   :target: https://circleci.com/gh/mozilla/mozilla-django-oidc/tree/main
+.. image:: https://github.com/mozilla/mozilla-django-oidc/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/mozilla/mozilla-django-oidc/actions/workflows/ci.yml
 
 A lightweight authentication and access management library for integration with OpenID Connect enabled authentication services.
 
@@ -46,7 +46,7 @@ Once installed, simply execute in the project root directory.
 
 ``tox`` will do the equivalent of installing virtual environments for every
 combination mentioned in the ``tox.ini`` file. If your system, for example,
-doesn't have ``python3.4`` those ``tox`` tests will be skipped.
+doesn't have ``python3.9`` those ``tox`` tests will be skipped.
 
 For a faster test-rinse-repeat cycle you can run tests in a specific
 environment with a specific version of Python and specific version of
@@ -55,7 +55,7 @@ Django of your choice. Here is such an example:
 
 .. code-block:: shell
 
-    $ virtualenv -p /path/to/bin/python3.8 venv
+    $ virtualenv -p /path/to/bin/python3.9 venv
     $ source venv
     (venv) $ pip install -r requirements/requirements_dev.txt
     (venv) $ DJANGO_SETTINGS_MODULE=tests.settings django-admin test
@@ -76,7 +76,7 @@ Local development
 The local development setup is based on Docker so you need the following installed in your system:
 
 * `docker`
-* `docker-compose`
+* `docker compose`
 
 You will also need to edit your ``hosts`` file to resolve ``testrp`` and ``testprovider`` hostnames to ``127.0.0.1``.
 
@@ -87,7 +87,7 @@ To run the `testrp` and `testprovider` instances run the following:
 
 .. code-block:: shell
 
-   (venv) $ docker-compose up -d testprovider testrp
+   (venv) $ docker compose up -d testprovider testrp
 
 Then visit the testing django app on: ``http://testrp:8081``.
 
@@ -96,8 +96,8 @@ In order to test a change you need to restart the ``testrp`` service.
 
 .. code-block:: shell
 
-   (venv) $ docker-compose stop testrp
-   (venv) $ docker-compose up -d testrp
+   (venv) $ docker compose stop testrp
+   (venv) $ docker compose up -d testrp
 
 Running integration tests
 =========================
@@ -106,7 +106,7 @@ Integration tests are mounted as a volume to the docker containers. Tests can be
 
 .. code-block:: shell
 
-   (venv) $ docker-compose run --service-ports testrunner
+   (venv) $ docker compose run --service-ports testrunner
 
 Linting
 -------
@@ -182,7 +182,7 @@ Here are the steps you need to follow in order to push a new release:
 
       git push origin 0.1.1
 
-The release is pushed automatically to PyPI using a travis deployment hook on every new tag.
+The release is pushed automatically to PyPI using automation on every new tag.
 
 
 License
@@ -199,5 +199,5 @@ Tools used in rendering this package:
 *  Cookiecutter_
 *  `cookiecutter-djangopackage`_
 
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
+.. _Cookiecutter: https://github.com/cookiecutter/cookiecutter
 .. _`cookiecutter-djangopackage`: https://github.com/pydanny/cookiecutter-djangopackage
