@@ -21,6 +21,6 @@ jobs:
       - name: Install build
         run: pip install build
       - name: Build package
-        run: make sdist
+        run:  python -m build --sdist --outdir dist/ .
       - name: Maybe store as artifact and then run matrix?
         run: mv dist/mozilla-django-oidc-* ./mozilla-django-oidc-dev.tar.gz
