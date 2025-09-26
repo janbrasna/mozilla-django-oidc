@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python_version }}
+      - name: Install build
+        run: pip install build
       - name: Build package
         run: make sdist
       - name: Maybe store as artifact and then run matrix?
