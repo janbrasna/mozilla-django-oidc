@@ -39,7 +39,6 @@ jobs:
           source /testrp_env/bin/activate
           pip install ./mozilla-django-oidc-*.tar.gz
           pip install "$DJANGO_VERSION"
-
       - name: Setup /etc/hosts
         run: |
           echo "127.0.0.1 testrp" | sudo tee -a /etc/hosts
@@ -47,26 +46,21 @@ jobs:
 
       - name: Run testprovider service
         run: |
-          source /testprovider_env/bin/activate
-          ./bin/run.sh &
-        working-directory: ./testprovider
-
+          . testprovider_env/bin/activate
+          ./testprovider/bin/run.sh &
       - name: Run testrp service
         run: |
-          source /testrp_env/bin/activate
-          ./bin/run.sh &
-        working-directory: ./testrp
+          . testrp_env/bin/activate
+          ./testrp/bin/run.sh &
 
       - name: Wait for testprovider
         run: |
           ./wait-for-it -p 8080 -h localhost -t 60
-
       - name: Wait for testrp
         run: |
           ./wait-for-it -p 8081 -h localhost -t 60
 
       - name: Run integration tests
         run: |
-          source /testrp_env/bin/activate
-          python integration_tests.py
-        working-directory: ./integration_tests
+          . testrp_env/bin/activate
+          python ./integration_tests/integration_tests.py
