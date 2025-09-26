@@ -1,0 +1,24 @@
+name: mozilla-django-oidc e2e tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python_version:
+          #- "3.9"
+          #- "3.10"
+          #- "3.11"
+          #- "3.12"
+          - "3.13"
+    name: Python ${{ matrix.python_version }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python_version }}
+      - name: Build package
+        run: make sdist
+      - name: Maybe store as artifact and then run matrix?
+        run: mv dist/mozilla-django-oidc-* ./mozilla-django-oidc-dev.tar.gz
