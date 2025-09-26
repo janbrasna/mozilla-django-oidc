@@ -2,25 +2,71 @@ name: mozilla-django-oidc e2e tests
 on: [push, pull_request]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python_version:
-          #- "3.9"
-          #- "3.10"
-          #- "3.11"
-          - "3.12"
-          #- "3.13"
-    name: Python ${{ matrix.python_version }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
-          python-version: ${{ matrix.python_version }}
+          python-version: "3.12"
       - name: Install build
         run: pip install build
       - name: Build package
         run:  python -m build --sdist --outdir dist/ .
-      - name: Maybe store as artifact and then run matrix?
-        run: mv dist/mozilla_django_oidc-*.tar.gz ./mozilla-django-oidc-dev.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mozilla-django-oidc-dev
+          path: dist/mozilla_django_oidc-*.tar.gz
+
+  container:
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: mozilla/oidc-testprovider:oidc_e2e_setup_py312-latest
+      env:
+        TEST_OIDC_ALGO: rs
+        DJANGO_VERSION: Django>=3.2.0,<4.0
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: mozilla-django-oidc-dev
+          path: ./
+
+      - name: Set up environment
+        run: |
+          python -m venv /testrp_env
+          source /testrp_env/bin/activate
+          pip install ./mozilla-django-oidc-*.tar.gz
+          pip install "$DJANGO_VERSION"
+
+      - name: Setup /etc/hosts
+        run: |
+          echo "127.0.0.1 testrp" | sudo tee -a /etc/hosts
+          echo "127.0.0.1 testprovider" | sudo tee -a /etc/hosts
+
+      - name: Run testprovider service
+        run: |
+          source /testprovider_env/bin/activate
+          ./bin/run.sh &
+        working-directory: ./testprovider
+
+      - name: Run testrp service
+        run: |
+          source /testrp_env/bin/activate
+          ./bin/run.sh &
+        working-directory: ./testrp
+
+      - name: Wait for testprovider
+        run: |
+          ./wait-for-it -p 8080 -h localhost -t 60
+
+      - name: Wait for testrp
+        run: |
+          ./wait-for-it -p 8081 -h localhost -t 60
+
+      - name: Run integration tests
+        run: |
+          source /testrp_env/bin/activate
+          python integration_tests.py
+        working-directory: ./integration_tests
